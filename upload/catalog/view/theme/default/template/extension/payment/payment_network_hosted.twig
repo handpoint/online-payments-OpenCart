@@ -1,0 +1,14 @@
+<form id="paymentgatewaymoduleform" action="{{ (isHostedModal is defined and isHostedModal == true) ? form_hosted_modal_url : form_hosted_url }}" method="post" >
+	<p>You will be redirected to the Payment Network Payment Gateway to complete payment.</p>
+
+	{% for key,value in formdata %}
+			<input type="hidden" name="{{ key }}" value="{{ value }}" />
+	{% endfor %}
+
+	<div class="buttons">
+		<div class="pull-right">
+			<input type="submit" value="{{ button_confirm }}" id="button-confirm" class="btn btn-primary" />
+		</div>
+	</div>
+</form>
+

@@ -1,0 +1,98 @@
+<div class="content" id="payment">
+    <h4>{{ text_credit_card }}</h4>
+
+    <form action="{{ process_url }}" method="post" id="cc_payment_form" >
+        <div style="background:transparent; min-width: 275px; max-width: 300px;">
+            <div class="form-group">
+                <label for="cardNumber">{{ cc_card_number }} <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="field-cardNumber" name="cardNumber" autocomplete="off">
+            </div>
+            <div class="form-group" style="display: flex; justify-content: space-between;">
+                <div class="form-group" style="width: 60%">
+                    <label for="cardExpiryDate">{{ cc_card_expiry_date }} <span class="text-danger">*</span></label>
+                    <div style="display: flex; justify-content: space-between;">
+                        <select class="form-control" style="width: 46%;" id="field-cardExpiryMonth" name="cardExpiryMonth" required='required'>
+                            <option value="" disabled selected>Month</option>
+                            {% for key,value in monthOptions %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                        <select class="form-control" style="width: 45%;" id="field-cardExpiryYear" name="cardExpiryYear" required='required'>
+                            <option value="" disabled selected>Year</option>
+                            {% for key,value in yearOptions %}
+                                <option value="{{ key }}">{{ value }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group" style="width: 30%">
+                    <label for="cardCVV">{{ cc_card_cvv }} (CVC) <span class="text-danger">*</span></label>
+                    <input class="form-control" type="text" id="field-cardCVV" name="cardCVV" autocomplete="off" placeholder="CVC">
+                </div>
+            </div>
+            {% for key,value in deviceData %}
+                <input type="hidden" name="browserInfo[{{ key }}]" id="{{ key }}" value="{{ value }}" />
+            {% endfor %}
+        </div>
+        <input type="submit" disabled value="{{ button_confirm }}" id="button-confirm" class="btn btn-primary pull-right" />
+    </form>
+
+</div>
+
+<script type="text/javascript" src="catalog/view/javascript/payform.js"></script>
+<script type="text/javascript">
+    var cardNumber = document.getElementById('field-cardNumber');
+
+    var isValidForm = {
+        cardNumber: null,
+        cvv: null,
+        expireDate: null
+    };
+
+    payform.cardNumberInput(cardNumber);
+    cardNumber.addEventListener('change', e => {
+        const validateCardNumber = payform.validateCardNumber(e.target.value);
+        isValidForm.cardNumber = validateCardNumber;
+
+        e.target.style.borderColor = validateCardNumber ? '#B0B0B0' : 'red';
+        document.getElementById('button-confirm').disabled = !(isValidForm.cvv && isValidForm.expireDate && isValidForm.cardNumber);
+    });
+
+    document.getElementById('field-cardCVV').addEventListener('change', e => {
+        const validateCardCVC = payform.validateCardCVC(e.target.value);
+        isValidForm.cvv = validateCardCVC;
+
+        e.target.style.borderColor = validateCardCVC ? '#B0B0B0' : 'red';
+        document.getElementById('button-confirm').disabled = !(isValidForm.cvv && isValidForm.expireDate && isValidForm.cardNumber);
+    });
+
+    var cardExpiryMonthElement = document.getElementById('field-cardExpiryMonth');
+    var cardExpiryYearElement = document.getElementById('field-cardExpiryYear');
+
+    var listener = e => {
+        let isValid = payform.validateCardExpiry(cardExpiryMonthElement.value, '20'+cardExpiryYearElement.value);
+
+        isValidForm.expireDate = isValid;
+        cardExpiryMonthElement.style.borderColor =  isValid ? '#B0B0B0' : 'red';
+        cardExpiryYearElement.style.borderColor = isValid ? '#B0B0B0' : 'red';
+
+        document.getElementById('button-confirm').disabled = !(isValidForm.cvv && isValidForm.expireDate && isValidForm.cardNumber);
+    };
+
+    cardExpiryMonthElement.addEventListener('change', listener);
+    cardExpiryYearElement.addEventListener('change', listener);
+
+    var screen_width = (window && window.screen ? window.screen.width : '0');
+    var screen_height = (window && window.screen ? window.screen.height : '0');
+    var screen_depth = (window && window.screen ? window.screen.colorDepth : '0');
+    var identity = (window && window.navigator ? window.navigator.userAgent : '');
+    var language = (window && window.navigator ? (window.navigator.language ? window.navigator.language : window.navigator.browserLanguage) : '');
+    var timezone = (new Date()).getTimezoneOffset();
+    var java = (window && window.navigator ? navigator.javaEnabled() : false);
+    document.getElementById('deviceIdentity').value = identity;
+    document.getElementById('deviceTimeZone').value = timezone;
+    document.getElementById('deviceCapabilities').value = 'javascript' + (java ? ',java' : '');
+    document.getElementById('deviceAcceptLanguage').value = language;
+    document.getElementById('deviceScreenResolution').value = screen_width + 'x' + screen_height + 'x' + screen_depth;
+
+</script>

@@ -1,0 +1,24 @@
+<p class="paymentgatewaymoduleform-message">You will be presented with the Payment Network Payment Gateway to complete payment.</p>
+
+<iframe id="paymentgatewayframe" name="paymentgatewayframe" frameBorder="0" seamless='seamless' style="width:699px; height: 1100px;margin: 0 auto;display:block;"></iframe>
+
+<form id="paymentgatewaymoduleform" action="{{ form_hosted_url }}" method="post"  target="paymentgatewayframe">
+
+    {% for key,value in formdata %}
+        <input type="hidden" name="{{ key }}" value="{{ value }}" />
+    {% endfor %}
+</form>
+
+<script>
+	// detects if jquery is loaded and adjusts the form for mobile devices
+	if (window.jQuery) {
+		$(function(){
+			if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+				$('form#paymentgatewaymoduleform').append('<input type="hidden" name="formResponsive"  value="Y"/>');
+				$('.paymentgatewaymoduleform-message').append('<input type="hidden" name="formResponsive"  value="Y"/>');
+				$('#paymentgatewayframe').css({ height : '1300px', width : '50%'});
+			}
+		});
+	}
+	document.getElementById('paymentgatewaymoduleform').submit();
+</script>
